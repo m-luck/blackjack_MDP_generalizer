@@ -5,19 +5,20 @@ import sub_decider as d
 from typing import List
 
 def test_read_args(args: List): 
-    n,l,u = p.read_args(args)
-    print("Just read in",n, l, u)
-    return n, l, u
+    n,l,u,concise = p.read_args(args)
+    if not concise: print("Have just read in NCards:",n, "| Lower Target:",l, "| Upper Target",u,"...")
+    else: print("For input",n, l, u,)
+    return n, l, u, concise
 
 def test_compute_prob(x,y,ncards,l,u,prob):
     win = pr.computeProb(x,y,ncards,l,u,prob)
     print("Probability of winning after drawing given",x,y,"is",win)
     return win
 
-def test_gen_arrs(n,l,u):
+def test_gen_arrs(n,l,u,c):
     probs, plays = d.generateArrays(n,l,u)
-    p.printArrGrid(probs)
-    p.printArrGrid(plays)
+    p.printArrGrid(plays, 'play',c)
+    p.printArrGrid(probs, 'prob',c)
     # p.printArr(probs)
     # p.printArr(plays)
     return probs, plays

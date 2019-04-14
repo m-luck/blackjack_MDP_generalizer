@@ -4,7 +4,11 @@ def read_args(args):
     except:
         print("Error reading in the three arguments (NCards, LowerTarget, UpperTarget).")
     else: 
-        return n, l, u
+        concise = False
+        if len(args) > 4:
+            if args[4] == "--concise":
+                concise = True
+        return n, l, u, concise
 
 def printArr(arr, pre="p(draw"):
     for i, xt in enumerate(arr):
@@ -19,14 +23,33 @@ def is_float(s):
     except ValueError:
         return False
 
-def printArrGrid(arr, pre="p(draw"):
-    for i, xt in enumerate(arr):
+def printArrGrid(arr,contentType:str,concise:bool):
+    sortedArr = sorted(arr)
+    title = "\nPlay" if contentType=='play' else "\nProb"
+    print(title)
+    if not concise:
+        header = "  "
+        for xt in sortedArr:
+            header += str(xt) + "        "
+        header += " X"
+        print(header)
+    for xt in sortedArr:
         xtVal = arr[xt]
-        row = ""
+        sortedXtval = sorted(arr[xt])
+        if not concise: row = str(xt) + " "
+        else: row = "\t"
         if is_float(xtVal[1]):
-            for j, yt in enumerate(xtVal):
-                row += "{p:.4f}\t".format(p=float(xtVal[yt]))
+            for yt in sortedXtval:
+                row += "{p:.4f}   ".format(p=float(xtVal[yt]))
         else: 
-            for j, yt in enumerate(xtVal):
-                row += "{p}\t".format(p=xtVal[yt])
+            if not concise:
+                for yt in sortedXtval:
+                    row += "{p}     ".format(p=xtVal[yt])
+            else:
+                for yt in sortedXtval:
+                    shortp = ''
+                    if xtVal[yt] == 'Draw': shortp = 'D'
+                    else: shortp = 'P'
+                    row += "{shortp} ".format(shortp=shortp)
         print(row)
+    if not concise: print("Y")
