@@ -3,70 +3,60 @@
 import sub_probability as pr
 from typing import Dict, List
 
-def other(p:int):
+def maybePass(my_score:int, other_score:int):
     '''
-    Returns the opposite player. 
-    0 -> 1
-    1-> 0
+    Dictates if current player should perhaps pass, based on the previous player's decision and both player's scores.
     '''
-    return abs(p-1) # Player is 0 or 1 so this operation returns choice of 1 or 0 (other player)
+    if my_score < other_score:
+        return False # I am forced to draw, because if I pass, other will have a higher score and win.
+    return True
 
-def otherChoice(p:int,h:List):
-    '''
-    Returns the decision of the previous player.
-    '''
-    mostRecent = h[-1]
-    choice = mostRecent['choice'][other(p)]
-    return choice
+def makeOptimalChoice(playProb:float,passProb:float):
+    if playProb > passProb:
+        return playProb,'DRAW'   
+    return passProb, 'PASS'
 
-def shouldDraw(p:int,h:List,probs:Dict):
-    '''
-    Dictates if current player should rationally draw, based on the previous player's decision and both player's scores.
-    '''
-    state = h[-1]
-    my_score = state['val'][p]
-    other_score = state['val'][other(p)]
-    # If the current player has a score that is less than the other, and the other player has just passed, 
-    # the current player is forced into a position to draw, since the rules say two passes in a row grant the victory to the highest score.
-    if my_score < other_score and otherChoice(p,h) == 'passed':
-        return True
-    elif probs[my_score][other_score] > probs[other_score][my_score]: # If there is greater chance of winning by drawing (rather than forcing the other into drawing), then draw!
-        return True 
-    return False
+def fillInElement(xt,yt,ncards,l,u,prob_arr,play_arr):
+    playProb = pr.compute_prob(xt,yt,ncards,l,u,prob_arr)
+    passProb = 1-playProb if maybePass(xt,yt) else 0
+    prob, choice = makeOptimalChoice(playProb, passProb)
+    prob_arr[xt][yt] = prob
+    play_arr[xt][yt] = choice
+    return prob_arr, play_arr
 
-def generatePlayArray(probs:Dict):
+def generateArrays(ncards:int,l:int,u:int):
+    '''
+    This populates the probability and play for every permutation of score.
+    Because they rely on each other, it starts from near endgame and generates in a staircase, symmetric manner until the whole array is fulfilled.
+    '''
+    prob_arr = {}
     play_arr = {}
-    for i, xt in enumerate(probs):
+    for xt in range(l-1,-1,-1):
+        prob_arr[xt] = {}
         play_arr[xt] = {}
-        xtVal = probs[xt]
-        for j, yt in enumerate(probs[xt]):
-            ytVal = xtVal[yt]
-            artifical_history = [{
-                'val': { 0: xt, 1: yt },
-                'choice': {0: 'draw', 1: 'draw'}
-                }]
-            play_arr[xt][yt] = 'Play' if shouldDraw(0,artifical_history,probs) else 'Pass'
-    return play_arr
+        for yt in range(l-1,xt-1,-1):
+            prob_arr, play_arr = fillInElement(xt,yt,ncards,l,u,prob_arr,play_arr)
+            prob_arr, play_arr = fillInElement(yt,xt,ncards,l,u,prob_arr,play_arr)
+    return prob_arr, play_arr
 
+# def nextTurnIs(h:List):
+#     '''
+#     Returns the player ID of whose turn is next.
+#     '''
+#     state = h[-1]
+#     return other(state['turn'])
 
-def nextTurnIs(h:List):
-    '''
-    Returns the player ID of whose turn is next.
-    '''
-    state = h[-1]
-    return other(state['turn'])
+# def game_march(p:int,h:List):
+#     '''
+#     This will move the game forward by one time step with optimal players. 
+#     Optimal move is determined by a game history state consisting of three parts:
+#     Whether or not the player Y has just passed, X’s total points, and Y’s total points. '''
+#     state = h[-1].copy()
+#     state['turn'] = nextTurnIs(state)
+#     score = state['val'][p]
+#     if state['choice'] == 'draw':
+#         newP = val + pr.draw()
+#     state['val'][p] = newP
 
-def game_march(p:int,h:List):
-    '''
-    This will move the game forward by one time step with optimal players. 
-    Optimal move is determined by a game history state consisting of three parts:
-    Whether or not the player Y has just passed, X’s total points, and Y’s total points. '''
-    state = h[-1].copy()
-    state['turn'] = nextTurnIs(state)
-    score = state['val'][p]
-    if state['choice'] == 'draw':
-        newP = val + pr.draw()
-    state['val'][p] = newP
-
-def addHistory(h:List, s:Dict):
-    h.append(s)
+# def addHistory(h:List, s:Dict):
+#     h.append(s)
