@@ -10,7 +10,7 @@ Author: Michael J. Lukiman. Combines adversarial lookahead and Markov Decision P
 ### To run:
     python bj.py <NCards> <LTarget> <UTarget> [--concise]
 
-(no --concise option will print out details of the grid.)
+(--concise option will print out grid without details, as in Davis' specification.)
 Python 3.7. No external packages required.
 
 ##### For any discrepancies email mll469@nyu.edu. Thank you for checking it out. 
