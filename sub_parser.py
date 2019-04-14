@@ -1,4 +1,9 @@
+# This file relates to input and formatting of output.
+
 def read_args(args):
+    '''
+    Read input.
+    '''
     try: 
         n, l, u = int(args[1]), int(args[2]), int(args[3])
     except:
@@ -11,12 +16,18 @@ def read_args(args):
         return n, l, u, concise
 
 def printArr(arr, pre="p(draw"):
+    '''
+    Prints line by line. For debugging.
+    '''
     for i, xt in enumerate(arr):
         xtVal = arr[xt]
         for j, yt in enumerate(xtVal):
             print("{pre}|[{xt},{yt}]) = {p} ".format(pre=pre,xt=xt, yt=yt, p=xtVal[yt]))
 
 def is_float(s):
+    '''
+    Attempts to cast to float and returns false if it cannot.
+    '''
     try:
         float(s)
         return True
@@ -24,6 +35,9 @@ def is_float(s):
         return False
 
 def printArrGrid(arr,contentType:str,concise:bool):
+    '''
+    Prints the grid as specified. Also has a more detailed default option. Use --concise for simple grid.
+    '''
     sortedArr = sorted(arr)
     title = "\nPlay" if contentType=='play' else "\nProb"
     print(title)

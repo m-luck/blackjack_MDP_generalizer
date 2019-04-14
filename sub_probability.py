@@ -5,6 +5,9 @@ import sub_parser as p
 from typing import Dict, List
 
 def compute_prob(me:int,other:int,ncards:int,l:int,u:int,prob:Dict):
+    '''
+    Computes the probability of winning we choose to draw in this state.
+    '''
     my_winning_prob = 0.0
     other_winning_prob = 0.0 # Note: this value is case-wise, while my_winning_prob monotonically increases in aggregate.
     for n in range(ncards,0,-1): # Draw a card.  

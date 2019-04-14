@@ -12,15 +12,22 @@ def maybePass(my_score:int, other_score:int):
     return True
 
 def makeOptimalChoice(playProb:float,passProb:float):
+    '''
+    Chooses between play (draw) or pass.
+    '''
     if playProb >= passProb:
         return playProb,'Draw' # When comparing to pass or draw, we are slightly more inclusive of drawing (matches output). 
     return passProb, 'Pass'
 
 def fillInElement(xt,yt,ncards,l,u,prob_arr,play_arr):
+    '''
+    Fills in optimal plays and their winning probabilities.
+    Returns updates dictionaries.
+    '''
     playProb = pr.compute_prob(xt,yt,ncards,l,u,prob_arr)
     passProb = 1-pr.compute_prob(yt,xt,ncards,l,u,prob_arr) if maybePass(xt,yt) else 0 # Only computes other if passing may be optimal. 
     prob, choice = makeOptimalChoice(playProb, passProb)
-    prob_arr[xt][yt] = prob
+    prob_arr[xt][yt] = prob # Save these results in our arrays.
     play_arr[xt][yt] = choice
     return prob_arr, play_arr
 
@@ -28,13 +35,14 @@ def generateArrays(ncards:int,l:int,u:int):
     '''
     This populates the probability and play for every permutation of score.
     Because they rely on each other, it starts from near endgame and generates in a staircase, symmetric manner until the whole array is fulfilled.
+    Returns final dictionaries.
     '''
     prob_arr = {}
     play_arr = {}
-    for xt in range(l-1,-1,-1):
+    for xt in range(l-1,-1,-1): # Counting down.
         prob_arr[xt] = {}
         play_arr[xt] = {}
-        for yt in range(l-1,xt-1,-1):
+        for yt in range(l-1,xt-1,-1): # Counting until yt == xt.
             prob_arr, play_arr = fillInElement(xt,yt,ncards,l,u,prob_arr,play_arr)
             prob_arr, play_arr = fillInElement(yt,xt,ncards,l,u,prob_arr,play_arr) # Fills in inverse as well!
     return prob_arr, play_arr

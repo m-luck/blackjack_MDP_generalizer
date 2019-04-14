@@ -1,3 +1,5 @@
+# This file has unit tests and is also used in final shipment.
+
 import sys
 import sub_parser as p
 import sub_probability as pr
@@ -26,7 +28,6 @@ def test_gen_arrs(n,l,u,c):
 if __name__ == "__main__":
     n, l, u = test_read_args(sys.argv)
     nlu = [n,l,u]
-    # assert test_joint_of([1,2,3]) == 6
     probs = {}
     # test_gen_prob(l-1,l-1,*nlu,probs)
     probs, plays = test_gen_arrs(*nlu)
